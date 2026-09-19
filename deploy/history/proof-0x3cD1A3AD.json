@@ -1,0 +1,154 @@
+{
+  "contract": "0x3cD1A3ADf13Fb6DFd46cfC65a331aCb2066b8f64",
+  "network": "studioDevnet",
+  "chainId": 61997,
+  "cases": [
+    {
+      "key": "compliant",
+      "expected": "COMPLIANT",
+      "proposalId": "demo-active-001",
+      "amount": 20000,
+      "evidence": [
+        "https://mandate-gate-azure.vercel.app/evidence/pool-active.html"
+      ],
+      "transaction": "0x83af2dfd9e8bdbb9fcc707f05b6f6bf1bd0d201040f57ec40d2a98c781cc191a",
+      "explorer": "https://explorer-studio-dev.genlayer.com/tx/0x83af2dfd9e8bdbb9fcc707f05b6f6bf1bd0d201040f57ec40d2a98c781cc191a",
+      "budgetBefore": {
+        "available": 100000,
+        "per_proposal_cap": 25000,
+        "reserved": 0,
+        "total_cap": 100000
+      },
+      "lifecycle": "FINALIZED",
+      "execution": "FINISHED_WITH_RETURN",
+      "budgetAfter": {
+        "available": 80000,
+        "per_proposal_cap": 25000,
+        "reserved": 20000,
+        "total_cap": 100000
+      },
+      "status": "COMPLIANT",
+      "reasonCodes": [
+        "IDENTITY_CONFIRMED",
+        "POOL_ACTIVE_SUPPORTED",
+        "NO_ADVERSE_REPORTS"
+      ],
+      "reasoning": "The source is from the designated_status_registry_host and is labelled as the official Harbor Exchange Status Registry, making it authoritative. It explicitly names the configured pool identifier 'HBX-WETH-USDC-5BP' and the configured pair 'WETH/USDC'. It states the pool's current status is 'ACTIVE, SUPPORTED' and reports no active suspensions, exploits, deprecations, or material operational warnings.",
+      "authorization": "RESERVED",
+      "reservedDelta": 20000,
+      "verified": true
+    },
+    {
+      "key": "non_compliant",
+      "expected": "NON_COMPLIANT",
+      "proposalId": "demo-warning-001",
+      "amount": 15000,
+      "evidence": [
+        "https://mandate-gate-azure.vercel.app/evidence/pool-warning.html"
+      ],
+      "transaction": "0xc879731e0d208df637e79c46deea381f9945ea7afa5403af2bb7e3a99be3d7fd",
+      "explorer": "https://explorer-studio-dev.genlayer.com/tx/0xc879731e0d208df637e79c46deea381f9945ea7afa5403af2bb7e3a99be3d7fd",
+      "budgetBefore": {
+        "available": 80000,
+        "per_proposal_cap": 25000,
+        "reserved": 20000,
+        "total_cap": 100000
+      },
+      "lifecycle": "FINALIZED",
+      "execution": "FINISHED_WITH_RETURN",
+      "budgetAfter": {
+        "available": 80000,
+        "per_proposal_cap": 25000,
+        "reserved": 20000,
+        "total_cap": 100000
+      },
+      "status": "NON_COMPLIANT",
+      "reasonCodes": [
+        "ADVERSE_REPORT",
+        "POOL_NOT_ACTIVE"
+      ],
+      "reasoning": "The designated status registry source explicitly identifies pool HBX-WETH-USDC-5BP and token pair WETH/USDC, so the configured pool identity is confirmed. That same authoritative record states the current status is \"SUSPENDED: new deposits paused\" and reports an \"ACTIVE\" price-oracle manipulation exploit under investigation with a warning not to add liquidity, so the pool is inactive/unsupported and an adverse report is active.",
+      "authorization": "NONE",
+      "reservedDelta": 0,
+      "verified": true
+    },
+    {
+      "key": "insufficient",
+      "expected": "INSUFFICIENT_EVIDENCE",
+      "proposalId": "demo-ambiguous-001",
+      "amount": 12000,
+      "evidence": [
+        "https://mandate-gate-azure.vercel.app/evidence/pool-ambiguous.html"
+      ],
+      "transaction": "0x72a65b371f2d438d56bd57f10e2f07081f84fa76c519213be7e7c46d284cbaeb",
+      "explorer": "https://explorer-studio-dev.genlayer.com/tx/0x72a65b371f2d438d56bd57f10e2f07081f84fa76c519213be7e7c46d284cbaeb",
+      "budgetBefore": {
+        "available": 80000,
+        "per_proposal_cap": 25000,
+        "reserved": 20000,
+        "total_cap": 100000
+      },
+      "lifecycle": "FINALIZED",
+      "execution": "FINISHED_WITH_RETURN",
+      "budgetAfter": {
+        "available": 80000,
+        "per_proposal_cap": 25000,
+        "reserved": 20000,
+        "total_cap": 100000
+      },
+      "status": "INSUFFICIENT_EVIDENCE",
+      "reasonCodes": [
+        "IDENTITY_MISMATCH"
+      ],
+      "reasoning": "The designated status registry page is authoritative, but it explicitly identifies pool HBX-WETH-USDT-5BP with token pair WETH/USDT, not the configured HBX-WETH-USDC-5BP and WETH/USDC. The same page says records for other WETH pools, including USDC-quoted pools, are not included there, so it does not establish the configured pool's current status or whether any active adverse notice exists.",
+      "authorization": "NONE",
+      "reservedDelta": 0,
+      "verified": true
+    },
+    {
+      "key": "over_cap",
+      "expected": "REVERT",
+      "proposalId": "demo-overcap-001",
+      "amount": 30000,
+      "evidence": [
+        "https://mandate-gate-azure.vercel.app/evidence/pool-active.html"
+      ],
+      "transaction": "0x467bf009c28192cc09143a774927f31aebe0f64dac3e844af95a7dea7a1beab1",
+      "explorer": "https://explorer-studio-dev.genlayer.com/tx/0x467bf009c28192cc09143a774927f31aebe0f64dac3e844af95a7dea7a1beab1",
+      "budgetBefore": {
+        "available": 80000,
+        "per_proposal_cap": 25000,
+        "reserved": 20000,
+        "total_cap": 100000
+      },
+      "lifecycle": "FINALIZED",
+      "execution": "FINISHED_WITH_ERROR",
+      "budgetAfter": {
+        "available": 80000,
+        "per_proposal_cap": 25000,
+        "reserved": 20000,
+        "total_cap": 100000
+      },
+      "onChainProposal": null,
+      "verified": true
+    }
+  ],
+  "finalBudget": {
+    "available": 80000,
+    "per_proposal_cap": 25000,
+    "reserved": 20000,
+    "total_cap": 100000
+  },
+  "summary": {
+    "available": 80000,
+    "cancelled": 0,
+    "compliant": 1,
+    "insufficient_evidence": 1,
+    "non_compliant": 1,
+    "proposals": 3,
+    "reserved": 20000,
+    "total_cap": 100000
+  },
+  "contractExplorer": "https://explorer-studio-dev.genlayer.com/address/0x3cD1A3ADf13Fb6DFd46cfC65a331aCb2066b8f64",
+  "updatedAt": "2026-09-18T16:15:49.613Z"
+}

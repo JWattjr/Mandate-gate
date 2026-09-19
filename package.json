@@ -1,0 +1,44 @@
+{
+  "name": "mandate-gate",
+  "version": "1.0.0",
+  "private": true,
+  "description": "MandateGate: an on-chain authorization layer that adjudicates treasury liquidity proposals against a frozen natural-language mandate on GenLayer Studio Next.",
+  "type": "module",
+  "engines": {
+    "node": ">=22.13.0"
+  },
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit",
+    "test:app": "node --experimental-strip-types --test tests/app/*.test.ts",
+    "contract:lint": "python -X utf8 -m genvm_linter.cli check contracts/mandate_gate.py",
+    "contract:test": "python -X utf8 -m pytest tests/direct",
+    "estimate-fees": "node scripts/estimate-fees.mjs",
+    "deploy:contract": "node scripts/deploy.mjs",
+    "seed:demo": "node scripts/seed-demo.mjs",
+    "smoke": "node scripts/smoke.mjs",
+    "demo:reset": "node scripts/deploy.mjs --fresh && node scripts/seed-demo.mjs",
+    "owner:transfer": "node scripts/transfer-owner.mjs",
+    "dev-wallet": "node scripts/dev-wallet.mjs",
+    "check": "npm run contract:lint && npm run contract:test && npm run lint && npm run typecheck && npm run test:app && npm run build"
+  },
+  "dependencies": {
+    "@genlayer/transaction-kit": "0.1.0-rc.2",
+    "genlayer-js": "2.0.0-rc.1",
+    "next": "16.3.4",
+    "react": "19.2.8",
+    "react-dom": "19.2.8"
+  },
+  "devDependencies": {
+    "@types/node": "22.19.19",
+    "@types/react": "19.2.14",
+    "@types/react-dom": "19.2.3",
+    "eslint": "9.39.1",
+    "eslint-config-next": "16.3.4",
+    "genlayer": "0.40.0-rc.3",
+    "typescript": "5.9.3"
+  }
+}

@@ -1,0 +1,10 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>MandateGate reviewer evidence fixtures</title><style>body{font:15px/1.55 -apple-system,Segoe UI,Roboto,sans-serif;max-width:760px;margin:32px auto;padding:0 16px;color:#1c2430;background:#f7f6f2}.fx{border:2px dashed #b4541a;background:#fff4ea;color:#7a3510;padding:10px 14px;border-radius:6px;font-weight:600}h1{font-size:22px;margin:22px 0 4px}table{border-collapse:collapse;width:100%;margin:14px 0}td,th{border:1px solid #d6d2c7;padding:7px 10px;text-align:left;vertical-align:top}th{background:#ecebe5;width:34%}.ok{color:#1d6b3a;font-weight:700}.bad{color:#a3231b;font-weight:700}.muted{color:#5c6470;font-size:13px}</style></head><body>
+<p class="fx">SYNTHETIC REVIEWER FIXTURE. Published by the MandateGate demonstration as its designated pool status registry. Harbor Exchange is a fictional venue; no real pool, token or incident is described.</p>
+<h1>MandateGate reviewer evidence fixtures</h1>
+<p>These three pages are synthetic inputs for the MandateGate demo. GenLayer validators fetch them over public HTTPS during adjudication. The frontend never passes a conclusion to the contract.</p>
+<table>
+<tr><th><a href="pool-active.html">pool-active.html</a></th><td>The configured pool HBX-WETH-USDC-5BP is active and supported, and no notices are open. Expected result: COMPLIANT.</td></tr>
+<tr><th><a href="pool-warning.html">pool-warning.html</a></th><td>The configured pool is suspended while an exploit is investigated. Expected result: NON_COMPLIANT.</td></tr>
+<tr><th><a href="pool-ambiguous.html">pool-ambiguous.html</a></th><td>The record covers a different pool (HBX-WETH-USDT-5BP) and says nothing about the configured pool. Expected result: INSUFFICIENT_EVIDENCE.</td></tr>
+</table>
+</body></html>

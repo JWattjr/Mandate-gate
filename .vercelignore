@@ -1,0 +1,8 @@
+.venv
+.keys
+.pytest_cache
+__pycache__
+tests
+artifacts
+.next
+docs/screenshots

@@ -1,0 +1,17 @@
+{
+  "appUrl": "https://mandate-gate-azure.vercel.app",
+  "registryHost": "mandate-gate-azure.vercel.app",
+  "mandateVersion": "v1",
+  "mandateText": "Authorize a liquidity allocation only when authoritative evidence establishes that the evidence refers to the configured pool and token identities, the pool is currently active and supported, and no authoritative submitted source reports an active suspension, exploit, deprecation, or material operational warning. Conflicting, ambiguous, non-authoritative, or incomplete evidence is insufficient.",
+  "pair": "WETH/USDC",
+  "poolId": "HBX-WETH-USDC-5BP",
+  "venue": "Harbor Exchange (synthetic)",
+  "totalCap": 100000,
+  "perProposalCap": 25000,
+  "fixtures": {
+    "active": "https://mandate-gate-azure.vercel.app/evidence/pool-active.html",
+    "warning": "https://mandate-gate-azure.vercel.app/evidence/pool-warning.html",
+    "ambiguous": "https://mandate-gate-azure.vercel.app/evidence/pool-ambiguous.html"
+  },
+  "explorer": "https://explorer-studio-dev.genlayer.com"
+}

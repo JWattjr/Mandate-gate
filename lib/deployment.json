@@ -1,0 +1,10 @@
+{
+  "network": "studioDevnet",
+  "chainId": 61997,
+  "rpc": "https://studio-dev.genlayer.com/api",
+  "contract": "0xA8a0Af05833A431bb59b9A2D8B565FD3E344E3e0",
+  "owner": "0x04a1514d29c3f0e2f32398f399623532c2592356",
+  "deployTransaction": "0x946a2c348b9ce1ff69ce6c12801195d46dcbc417e878d47795c21a999ac26389",
+  "deployedAt": "2026-09-18T20:03:38.341Z",
+  "runner": "{ \"Depends\": \"py-genlayer:5jycge4q8k23462jtb0b9fyey1s9qz928sz2nbrd9mg4sxqg2qng\" }"
+}

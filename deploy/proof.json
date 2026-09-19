@@ -1,0 +1,260 @@
+{
+  "contract": "0xA8a0Af05833A431bb59b9A2D8B565FD3E344E3e0",
+  "network": "studioDevnet",
+  "chainId": 61997,
+  "cases": [
+    {
+      "key": "compliant",
+      "expected": "COMPLIANT",
+      "proposalId": "demo-active-001",
+      "amount": 20000,
+      "evidence": [
+        "https://mandate-gate-azure.vercel.app/evidence/pool-active.html"
+      ],
+      "transaction": "0x815ef37599f73b1beeeb63492465325edc951d4c18306ecae2c02befc3e6a17e",
+      "explorer": "https://explorer-studio-dev.genlayer.com/tx/0x815ef37599f73b1beeeb63492465325edc951d4c18306ecae2c02befc3e6a17e",
+      "budgetBefore": {
+        "available": 100000,
+        "per_proposal_cap": 25000,
+        "reserved": 0,
+        "total_cap": 100000
+      },
+      "lifecycle": "FINALIZED",
+      "execution": "FINISHED_WITH_RETURN",
+      "budgetAfter": {
+        "available": 80000,
+        "per_proposal_cap": 25000,
+        "reserved": 20000,
+        "total_cap": 100000
+      },
+      "status": "COMPLIANT",
+      "reasonCodes": [
+        "IDENTITY_CONFIRMED",
+        "POOL_ACTIVE_SUPPORTED",
+        "NO_ADVERSE_REPORTS"
+      ],
+      "reasoning": "The designated status registry source explicitly identifies pool \"HBX-WETH-USDC-5BP\" with token pair \"WETH/USDC,\" confirming the configured pool and pair. It states the pool is \"ACTIVE, SUPPORTED\" and says there are no active suspensions, exploits, deprecations, or material operational warnings.",
+      "authorization": "RESERVED",
+      "reservedDelta": 20000,
+      "verified": true
+    },
+    {
+      "key": "non_compliant",
+      "expected": "NON_COMPLIANT",
+      "proposalId": "demo-warning-001",
+      "amount": 15000,
+      "evidence": [
+        "https://mandate-gate-azure.vercel.app/evidence/pool-warning.html"
+      ],
+      "transaction": "0x0d00b374b20875e99b7ce99a7f3771f76035034ef54db089e70286da91b45e24",
+      "explorer": "https://explorer-studio-dev.genlayer.com/tx/0x0d00b374b20875e99b7ce99a7f3771f76035034ef54db089e70286da91b45e24",
+      "budgetBefore": {
+        "available": 80000,
+        "per_proposal_cap": 25000,
+        "reserved": 20000,
+        "total_cap": 100000
+      },
+      "lifecycle": "FINALIZED",
+      "execution": "FINISHED_WITH_RETURN",
+      "budgetAfter": {
+        "available": 80000,
+        "per_proposal_cap": 25000,
+        "reserved": 20000,
+        "total_cap": 100000
+      },
+      "status": "NON_COMPLIANT",
+      "reasonCodes": [
+        "ADVERSE_REPORT",
+        "POOL_NOT_ACTIVE"
+      ],
+      "reasoning": "The designated status registry source explicitly identifies pool HBX-WETH-USDC-5BP and token pair WETH/USDC, matching the configured pool and pair. It states the current status is \"SUSPENDED: new deposits paused\" and reports an \"ACTIVE\" price-oracle manipulation exploit under investigation, with a warning not to add liquidity until the incident is closed.",
+      "authorization": "NONE",
+      "reservedDelta": 0,
+      "verified": true
+    },
+    {
+      "key": "insufficient",
+      "expected": "INSUFFICIENT_EVIDENCE",
+      "proposalId": "demo-ambiguous-001",
+      "amount": 12000,
+      "evidence": [
+        "https://mandate-gate-azure.vercel.app/evidence/pool-ambiguous.html"
+      ],
+      "transaction": "0x9ea39506ea8e1eb5acfd08763eb27d061a782ce963db5810bd5f30baec859818",
+      "explorer": "https://explorer-studio-dev.genlayer.com/tx/0x9ea39506ea8e1eb5acfd08763eb27d061a782ce963db5810bd5f30baec859818",
+      "budgetBefore": {
+        "available": 80000,
+        "per_proposal_cap": 25000,
+        "reserved": 20000,
+        "total_cap": 100000
+      },
+      "lifecycle": "FINALIZED",
+      "execution": "FINISHED_WITH_RETURN",
+      "budgetAfter": {
+        "available": 80000,
+        "per_proposal_cap": 25000,
+        "reserved": 20000,
+        "total_cap": 100000
+      },
+      "status": "INSUFFICIENT_EVIDENCE",
+      "reasonCodes": [
+        "IDENTITY_MISMATCH"
+      ],
+      "reasoning": "The authoritative registry entry from the designated status registry host explicitly identifies pool HBX-WETH-USDT-5BP with pair WETH/USDT, which does not match the configured pool ID (HBX-WETH-USDC-5BP) or pair (WETH/USDC). The source explicitly states that records for WETH/USDC pools are not included on this page and are being migrated, meaning no authoritative information about the configured pool's state or any adverse notices is available. Because the sole authoritative source covers a different pool entirely, identity is a mismatch and pool state and adverse report cannot be determined.",
+      "authorization": "NONE",
+      "reservedDelta": 0,
+      "verified": true
+    },
+    {
+      "key": "over_cap",
+      "expected": "REVERT",
+      "proposalId": "demo-overcap-001",
+      "amount": 30000,
+      "evidence": [
+        "https://mandate-gate-azure.vercel.app/evidence/pool-active.html"
+      ],
+      "transaction": "0xfb634d647481715880b74125d674b1cf7114d37863ed7d21076239e6b3c6b598",
+      "explorer": "https://explorer-studio-dev.genlayer.com/tx/0xfb634d647481715880b74125d674b1cf7114d37863ed7d21076239e6b3c6b598",
+      "budgetBefore": {
+        "available": 80000,
+        "per_proposal_cap": 25000,
+        "reserved": 20000,
+        "total_cap": 100000
+      },
+      "lifecycle": "FINALIZED",
+      "execution": "FINISHED_WITH_ERROR",
+      "budgetAfter": {
+        "available": 80000,
+        "per_proposal_cap": 25000,
+        "reserved": 20000,
+        "total_cap": 100000
+      },
+      "onChainProposal": null,
+      "verified": true
+    },
+    {
+      "key": "cancel_setup",
+      "expected": "COMPLIANT",
+      "proposalId": "demo-cancel-001",
+      "amount": 5000,
+      "evidence": [
+        "https://mandate-gate-azure.vercel.app/evidence/pool-active.html"
+      ],
+      "transaction": "0xce6b382a2a121057f9daa8437b562d7fb7aaed159d5612b25cc8547486c08f76",
+      "explorer": "https://explorer-studio-dev.genlayer.com/tx/0xce6b382a2a121057f9daa8437b562d7fb7aaed159d5612b25cc8547486c08f76",
+      "budgetBefore": {
+        "available": 80000,
+        "per_proposal_cap": 25000,
+        "reserved": 20000,
+        "total_cap": 100000
+      },
+      "lifecycle": "FINALIZED",
+      "execution": "FINISHED_WITH_RETURN",
+      "budgetAfter": {
+        "available": 75000,
+        "per_proposal_cap": 25000,
+        "reserved": 25000,
+        "total_cap": 100000
+      },
+      "status": "COMPLIANT",
+      "reasonCodes": [
+        "IDENTITY_CONFIRMED",
+        "POOL_ACTIVE_SUPPORTED",
+        "NO_ADVERSE_REPORTS"
+      ],
+      "reasoning": "The designated status registry source explicitly identifies pool \"HBX-WETH-USDC-5BP\" with token pair \"WETH/USDC,\" matching the configured pool and pair. It states the pool is \"ACTIVE, SUPPORTED,\" with deposits and withdrawals open, and says there are no active suspensions, exploits, deprecations, or material operational warnings.",
+      "authorization": "RESERVED",
+      "reservedDelta": 5000,
+      "verified": true
+    },
+    {
+      "key": "cancellation",
+      "method": "cancel_authorization",
+      "args": [
+        "demo-cancel-001"
+      ],
+      "transaction": "0x0e8046b7a275bd889ea12f8d5b9819dd91f1d441a250098760a54be550dbcd5f",
+      "explorer": "https://explorer-studio-dev.genlayer.com/tx/0x0e8046b7a275bd889ea12f8d5b9819dd91f1d441a250098760a54be550dbcd5f",
+      "budgetBefore": {
+        "available": 75000,
+        "per_proposal_cap": 25000,
+        "reserved": 25000,
+        "total_cap": 100000
+      },
+      "lifecycle": "FINALIZED",
+      "execution": "FINISHED_WITH_RETURN",
+      "budgetAfter": {
+        "available": 80000,
+        "per_proposal_cap": 25000,
+        "reserved": 20000,
+        "total_cap": 100000
+      },
+      "authorization": "CANCELLED",
+      "releasedDelta": 5000,
+      "verified": true
+    },
+    {
+      "key": "ownership",
+      "method": "transfer_ownership",
+      "args": [
+        "0x2Ea195AEb300bbE3ba3E8e0dd71AB3260b0AeEBF"
+      ],
+      "transaction": "0xdf2cbb1592753fe58ea5608968ef6c42d80eed42e1acf893de138d041596cd5c",
+      "explorer": "https://explorer-studio-dev.genlayer.com/tx/0xdf2cbb1592753fe58ea5608968ef6c42d80eed42e1acf893de138d041596cd5c",
+      "budgetBefore": {
+        "available": 80000,
+        "per_proposal_cap": 25000,
+        "reserved": 20000,
+        "total_cap": 100000
+      },
+      "lifecycle": "FINALIZED",
+      "execution": "FINISHED_WITH_RETURN",
+      "budgetAfter": {
+        "available": 80000,
+        "per_proposal_cap": 25000,
+        "reserved": 20000,
+        "total_cap": 100000
+      },
+      "verified": true
+    }
+  ],
+  "updatedAt": "2026-09-18T20:12:40.832Z",
+  "finalBudget": {
+    "available": 80000,
+    "per_proposal_cap": 25000,
+    "reserved": 20000,
+    "total_cap": 100000
+  },
+  "summary": {
+    "available": 80000,
+    "cancelled": 1,
+    "compliant": 2,
+    "insufficient_evidence": 1,
+    "non_compliant": 1,
+    "proposals": 4,
+    "reserved": 20000,
+    "total_cap": 100000
+  },
+  "contractExplorer": "https://explorer-studio-dev.genlayer.com/address/0xA8a0Af05833A431bb59b9A2D8B565FD3E344E3e0",
+  "uiCases": [
+    {
+      "key": "ui_compliant",
+      "transaction": "0x270d65801d2ca34bb075e710da00b3bab36ec46704aaaccd440262d451c9dc8c",
+      "proposalId": "active-09182013-r98z",
+      "expected": "COMPLIANT",
+      "status": "COMPLIANT",
+      "reservedBefore": 20000,
+      "reservedAfter": 25000,
+      "via": "web UI + injected EIP-1193 dev wallet"
+    },
+    {
+      "key": "ui_cancellation",
+      "transaction": "0x8e5d83c0dd75654baa249a657d69521b22dde96ab1d6967057374868e247e87d",
+      "proposalId": "active-09182013-r98z",
+      "authorization": "CANCELLED",
+      "reservedBefore": 25000,
+      "reservedAfter": 20000,
+      "via": "web UI owner Cancel control"
+    }
+  ]
+}

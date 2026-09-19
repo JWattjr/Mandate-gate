@@ -1,0 +1,11 @@
+# GenLayer test runner networks.
+# Direct tests need no network. Studio Next is the only live target.
+networks:
+  default: localnet
+  localnet:
+    url: "http://127.0.0.1:4000/api"
+  # Studio Next: chain 61997, RPC https://studio-dev.genlayer.com/api
+  studio_devnet: {}
+paths:
+  contracts: "contracts"
+environment: .env

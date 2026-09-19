@@ -1,0 +1,17 @@
+node_modules/
+.next/
+out/
+.venv/
+__pycache__/
+.pytest_cache/
+.keys/
+.env
+.env.local
+.env*.local
+.vercel/
+.impeccable/
+*.log
+next-env.d.ts
+tsconfig.tsbuildinfo
+
+.vercel
