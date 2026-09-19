@@ -53,6 +53,7 @@ import {
   Verdict,
   type HistoryFilter,
 } from './ui';
+import { Backdrop, Gatekeeper, Icon, Loader, PixelAvatar, type IconName } from './art';
 
 type Stage = 'quoting' | 'signing' | 'pending' | 'processing' | 'decided' | 'finalized' | 'failed';
 
@@ -73,9 +74,9 @@ const STORAGE_KEY = 'mandategate.activeTx.v1';
 const LOW_BALANCE = 5n * 10n ** 17n;
 
 const FIXTURES = [
-  { key: 'active', label: 'Active pool', url: demo.fixtures.active, color: 'var(--ok)' },
-  { key: 'warning', label: 'Exploit warning', url: demo.fixtures.warning, color: 'var(--bad)' },
-  { key: 'ambiguous', label: 'Different pool', url: demo.fixtures.ambiguous, color: 'var(--warn)' },
+  { key: 'active', label: 'Active pool', url: demo.fixtures.active, hint: 'Pool active and supported', icon: 'check' },
+  { key: 'warning', label: 'Exploit warning', url: demo.fixtures.warning, hint: 'Suspension reported', icon: 'cross' },
+  { key: 'ambiguous', label: 'Different pool', url: demo.fixtures.ambiguous, hint: 'Identity mismatch', icon: 'question' },
 ] as const;
 
 function freshId(prefix = 'prop') {
@@ -394,9 +395,11 @@ export default function CommandCenter() {
     : 'Reading Studio Next…';
 
   const canSubmit = !!account && onRightChain && !busy && !!snapshot;
+  const filledUrls = draft.urls.map((u) => u.trim()).filter(Boolean);
 
   return (
     <>
+      <Backdrop />
       <header className="topbar">
         <div className="topbar-inner">
           <div className="brand">
@@ -406,29 +409,42 @@ export default function CommandCenter() {
               <div className="brand-sub">Treasury liquidity authorization · GenLayer</div>
             </div>
           </div>
-          <span className="net-badge" title={`RPC ${chain.rpcUrls.default.http[0]}`}>
-            <span className={`dot ${rpcLive === true ? 'live' : rpcLive === false ? 'down' : ''}`} />
+          <span className="hud-pill net-badge" title={`RPC ${chain.rpcUrls.default.http[0]}`}>
+            <span className={`dot ${rpcLive === true ? 'live' : rpcLive === false ? 'down' : ''}`} aria-hidden="true" />
+            <span className="hud-label" aria-hidden="true">
+              SYS
+            </span>
             Studio Next · chain {CHAIN_ID}
+            <span className="visually-hidden">
+              {rpcLive === true ? ', online' : rpcLive === false ? ', unreachable' : ', connecting'}
+            </span>
           </span>
           <div className="wallet-cluster">
             {account ? (
               <>
-                <span className="address-chip" title={account}>
-                  {shortHex(account)}
-                  {isOwner ? <span className="owner-tag">OWNER</span> : null}
+                <span className="hud-pill player-badge" title={account}>
+                  <PixelAvatar address={account} />
+                  <span className="mono">{shortHex(account)}</span>
+                  {isOwner ? (
+                    <span className="owner-tag">
+                      <Icon name="star" size={11} />
+                      OWNER
+                    </span>
+                  ) : null}
                 </span>
-                <button type="button" className="btn on-dark secondary small" onClick={disconnect}>
+                <button type="button" className="btn hud-btn secondary small" onClick={disconnect}>
                   Disconnect
                 </button>
               </>
             ) : wallets.length ? (
               wallets.slice(0, 2).map((w) => (
-                <button key={w.id} type="button" className="btn on-dark small" onClick={() => void connectWallet(w)}>
+                <button key={w.id} type="button" className="btn hud-btn small" onClick={() => void connectWallet(w)}>
+                  <Icon name="bolt" size={14} />
                   Connect {wallets.length > 1 ? w.name : 'wallet'}
                 </button>
               ))
             ) : (
-              <span className="net-badge">No browser wallet detected</span>
+              <span className="hud-pill net-badge">No browser wallet detected</span>
             )}
           </div>
         </div>
@@ -436,7 +452,10 @@ export default function CommandCenter() {
 
       <div className="disclosure" role="note">
         <div className="disclosure-inner">
-          <strong>Authorization prototype. No assets are held or deployed.</strong>
+          <strong>
+            <Icon name="shield" size={14} />
+            Authorization prototype. No assets are held or deployed.
+          </strong>
           <span>
             Amounts are accounting units in a demonstration budget. A COMPLIANT decision reserves units on-chain; nothing
             is swapped, bridged or deposited.
@@ -445,43 +464,61 @@ export default function CommandCenter() {
       </div>
 
       <main className="page">
-        <section className="page-intro" aria-labelledby="page-title">
-          <div className="intro-copy">
+        <section className="hero" aria-labelledby="page-title">
+          <div className="hero-copy">
             <h1 id="page-title">Review every allocation before it moves.</h1>
             <p>
               Read the frozen mandate, confirm the evidence sources, and submit one treasury authorization to GenLayer
               consensus.
             </p>
+            <ol className="mission-path" aria-label="Authorization review flow">
+              {(
+                [
+                  ['1', 'Read mandate', 'scroll'],
+                  ['2', 'Check evidence', 'lens'],
+                  ['3', 'Submit authorization', 'flag'],
+                ] as const
+              ).map(([n, label, icon]) => (
+                <li className="mission-node" key={n}>
+                  <span className="mission-marker" aria-hidden="true">
+                    <Icon name={icon} size={18} />
+                  </span>
+                  <span className="mission-step">
+                    <span className="step-num">Step {n}</span>
+                    {label}
+                  </span>
+                </li>
+              ))}
+            </ol>
           </div>
-          <div className="intro-rail" aria-label="Authorization review flow">
-            <div className="intro-step">
-              <span className="intro-step-index">01</span>
-              <span>Read mandate</span>
-            </div>
-            <div className="intro-step">
-              <span className="intro-step-index">02</span>
-              <span>Check evidence</span>
-            </div>
-            <div className="intro-step">
-              <span className="intro-step-index">03</span>
-              <span>Submit authorization</span>
+          <div className="hero-scene" aria-hidden="true">
+            <div className="scene-card">
+              <span className="scene-cloud scene-cloud-a" />
+              <span className="scene-cloud scene-cloud-b" />
+              <Gatekeeper mood={busy ? 'waiting' : 'idle'} size={118} className="scene-mascot" />
+              <span className="scene-ground" />
+              <span className="scene-bubble">
+                {busy ? 'Validators are reviewing…' : 'Every proposal meets the rulebook first.'}
+              </span>
             </div>
           </div>
         </section>
 
         {!configured ? (
-          <div className="notice bad" style={{ marginBottom: 20 }}>
+          <div className="notice bad page-notice">
             No MandateGate contract is configured. Run <code>npm run deploy:contract</code> or set
             NEXT_PUBLIC_MANDATEGATE_ADDRESS.
           </div>
         ) : null}
         {loadError ? (
-          <div className="notice bad notice-row" style={{ marginBottom: 20 }}>
-            <span>
+          <div className="notice bad notice-row page-notice" role="alert">
+            <Gatekeeper mood="concerned" size={40} />
+            <span className="notice-text">
               Could not read the contract from Studio Next: {loadError}. Studio Next may have been reset, or it may be
               rate-limiting this browser.
             </span>
             <button type="button" className="btn secondary small" onClick={() => void refresh()} disabled={refreshing}>
+              {refreshing ? <Loader /> : null}
               Retry
             </button>
           </div>
@@ -493,10 +530,12 @@ export default function CommandCenter() {
 
             <Panel
               title="New proposal"
+              kicker="Current mission"
+              icon="scroll"
               id="form-title"
               className="proposal-panel"
               meta={
-                <span>
+                <span className="target-chip">
                   {demo.pair} · <span className="mono">{demo.poolId}</span>
                 </span>
               }
@@ -511,99 +550,133 @@ export default function CommandCenter() {
                 onFund={() => void fund()}
                 error={walletError}
               />
-              <form className="form" onSubmit={submitProposal} noValidate style={{ marginTop: 14 }}>
-                <div className="row-2">
-                  <div className="field">
-                    <label htmlFor="pid">Proposal ID</label>
-                    <input
-                      id="pid"
-                      className="input mono"
-                      value={draft.proposalId}
-                      onChange={(e) => setDraft({ ...draft, proposalId: e.target.value })}
-                      aria-invalid={touched && !!errors.proposalId}
-                      aria-describedby="pid-help"
-                      autoComplete="off"
-                      spellCheck={false}
-                    />
-                    <span id="pid-help" className={touched && errors.proposalId ? 'error-text' : 'hint'}>
-                      {touched && errors.proposalId ? errors.proposalId : 'Unique. A used ID is rejected deterministically.'}
+              <form className="form" onSubmit={submitProposal} noValidate>
+                <section className="stage" aria-labelledby="stage-details">
+                  <h3 className="stage-title" id="stage-details">
+                    <span className="step-badge" aria-hidden="true">
+                      1
                     </span>
-                  </div>
-                  <div className="field">
-                    <label htmlFor="amount">Allocation amount</label>
-                    <div className="input-with-suffix">
+                    Proposal details
+                  </h3>
+                  <div className="row-2">
+                    <div className="field">
+                      <label htmlFor="pid">Proposal ID</label>
                       <input
-                        id="amount"
-                        className="input num"
-                        inputMode="numeric"
-                        value={draft.amount}
-                        onChange={(e) => setDraft({ ...draft, amount: e.target.value })}
-                        aria-invalid={touched && !!errors.amount}
-                        aria-describedby="amount-help"
-                        autoComplete="off"
-                      />
-                      <span className="suffix">units</span>
-                    </div>
-                    <span id="amount-help" className={touched && errors.amount ? 'error-text' : 'hint'}>
-                      {touched && errors.amount
-                        ? errors.amount
-                        : `Whole units, max ${units(snapshot?.budget.per_proposal_cap ?? demo.perProposalCap)} per proposal.`}
-                    </span>
-                  </div>
-                </div>
-
-                <div className="field">
-                  <label htmlFor="rationale">Rationale</label>
-                  <textarea
-                    id="rationale"
-                    className="textarea"
-                    value={draft.rationale}
-                    maxLength={600}
-                    onChange={(e) => setDraft({ ...draft, rationale: e.target.value })}
-                    aria-invalid={touched && !!errors.rationale}
-                    aria-describedby="rationale-help"
-                  />
-                  <span id="rationale-help" className={touched && errors.rationale ? 'error-text' : 'hint'}>
-                    {touched && errors.rationale
-                      ? errors.rationale
-                      : `${draft.rationale.length}/600. Treated as untrusted context; it cannot override the mandate.`}
-                  </span>
-                </div>
-
-                <fieldset className="field" style={{ border: 0, padding: 0, margin: 0 }}>
-                  <legend className="label">Evidence URLs (1–3, public HTTPS)</legend>
-                  <div className="fixtures" aria-label="Load a synthetic reviewer fixture">
-                    {FIXTURES.map((f) => (
-                      <button
-                        key={f.key}
-                        type="button"
-                        className="chip-btn"
-                        onClick={() => applyFixture(f.url, f.key)}
-                        disabled={busy}
-                      >
-                        <span className="chip-swatch" style={{ background: f.color }} />
-                        {f.label} fixture
-                      </button>
-                    ))}
-                  </div>
-                  {draft.urls.map((url, index) => (
-                    <div className="url-row" key={index}>
-                      <input
+                        id="pid"
                         className="input mono"
-                        type="url"
-                        placeholder={index === 0 ? 'https://…' : 'Optional additional source, e.g. a live status page'}
-                        aria-label={`Evidence URL ${index + 1}`}
-                        value={url}
-                        onChange={(e) => {
-                          const urls = [...draft.urls];
-                          urls[index] = e.target.value;
-                          setDraft({ ...draft, urls });
-                        }}
-                        aria-invalid={touched && !!errors.urls}
+                        value={draft.proposalId}
+                        onChange={(e) => setDraft({ ...draft, proposalId: e.target.value })}
+                        aria-invalid={touched && !!errors.proposalId}
+                        aria-describedby="pid-help"
+                        autoComplete="off"
                         spellCheck={false}
                       />
+                      <span id="pid-help" className={touched && errors.proposalId ? 'error-text' : 'hint'}>
+                        {touched && errors.proposalId ? errors.proposalId : 'Unique. A used ID is rejected deterministically.'}
+                      </span>
                     </div>
-                  ))}
+                    <div className="field">
+                      <label htmlFor="amount">Allocation amount</label>
+                      <div className="input-with-suffix">
+                        <input
+                          id="amount"
+                          className="input num"
+                          inputMode="numeric"
+                          value={draft.amount}
+                          onChange={(e) => setDraft({ ...draft, amount: e.target.value })}
+                          aria-invalid={touched && !!errors.amount}
+                          aria-describedby="amount-help"
+                          autoComplete="off"
+                        />
+                        <span className="suffix">units</span>
+                      </div>
+                      <span id="amount-help" className={touched && errors.amount ? 'error-text' : 'hint'}>
+                        {touched && errors.amount
+                          ? errors.amount
+                          : `Whole units, max ${units(snapshot?.budget.per_proposal_cap ?? demo.perProposalCap)} per proposal.`}
+                      </span>
+                    </div>
+                  </div>
+                </section>
+
+                <section className="stage" aria-labelledby="stage-rationale">
+                  <h3 className="stage-title" id="stage-rationale">
+                    <span className="step-badge" aria-hidden="true">
+                      2
+                    </span>
+                    <label htmlFor="rationale">Rationale</label>
+                  </h3>
+                  <div className="field">
+                    <textarea
+                      id="rationale"
+                      className="textarea"
+                      value={draft.rationale}
+                      maxLength={600}
+                      onChange={(e) => setDraft({ ...draft, rationale: e.target.value })}
+                      aria-invalid={touched && !!errors.rationale}
+                      aria-describedby="rationale-help"
+                    />
+                    <span id="rationale-help" className={touched && errors.rationale ? 'error-text' : 'hint'}>
+                      {touched && errors.rationale
+                        ? errors.rationale
+                        : `${draft.rationale.length}/600. Treated as untrusted context; it cannot override the mandate.`}
+                    </span>
+                  </div>
+                </section>
+
+                <fieldset className="stage stage-fieldset">
+                  <legend className="stage-title">
+                    <span className="step-badge" aria-hidden="true">
+                      3
+                    </span>
+                    Evidence URLs (1–3, public HTTPS)
+                  </legend>
+                  <div className="fixtures" role="group" aria-label="Load a synthetic reviewer fixture">
+                    {FIXTURES.map((f) => {
+                      const selectedFixture = filledUrls.length === 1 && filledUrls[0] === f.url;
+                      return (
+                        <button
+                          key={f.key}
+                          type="button"
+                          className={`cartridge cartridge-${f.key}`}
+                          onClick={() => applyFixture(f.url, f.key)}
+                          disabled={busy}
+                          aria-pressed={selectedFixture}
+                        >
+                          <span className="cartridge-icon" aria-hidden="true">
+                            <Icon name={f.icon as IconName} size={16} />
+                          </span>
+                          <span className="cartridge-text">
+                            <b>{f.label} fixture</b>
+                            <small>{f.hint}</small>
+                          </span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                  <div className="url-list">
+                    {draft.urls.map((url, index) => (
+                      <div className="url-row" key={index}>
+                        <span className="url-slot" aria-hidden="true">
+                          {index + 1}
+                        </span>
+                        <input
+                          className="input mono"
+                          type="url"
+                          placeholder={index === 0 ? 'https://…' : 'Optional additional source, e.g. a live status page'}
+                          aria-label={`Evidence URL ${index + 1}`}
+                          value={url}
+                          onChange={(e) => {
+                            const urls = [...draft.urls];
+                            urls[index] = e.target.value;
+                            setDraft({ ...draft, urls });
+                          }}
+                          aria-invalid={touched && !!errors.urls}
+                          spellCheck={false}
+                        />
+                      </div>
+                    ))}
+                  </div>
                   <span className={touched && errors.urls ? 'error-text' : 'hint'}>
                     {touched && errors.urls
                       ? errors.urls
@@ -611,23 +684,31 @@ export default function CommandCenter() {
                   </span>
                 </fieldset>
 
-                <div className="actions">
-                  <button type="submit" className="btn" disabled={!canSubmit}>
-                    {busy ? <span className="spinner" aria-hidden="true" /> : null}
-                    Submit for adjudication
-                  </button>
-                  <span className="hint">
-                    {!account
-                      ? 'Connect a wallet to submit.'
-                      : !onRightChain
-                        ? 'Switch to Studio Next to submit.'
-                        : busy
-                          ? 'A transaction is in progress.'
-                          : !snapshot
-                            ? 'Waiting for contract state from Studio Next before submitting.'
-                          : 'Deterministic limits run first; then validators fetch and assess the evidence.'}
-                  </span>
-                </div>
+                <section className="stage stage-submit" aria-labelledby="stage-submit">
+                  <h3 className="stage-title" id="stage-submit">
+                    <span className="step-badge" aria-hidden="true">
+                      4
+                    </span>
+                    Submit
+                  </h3>
+                  <div className="actions">
+                    <button type="submit" className="btn btn-primary btn-launch" disabled={!canSubmit}>
+                      {busy ? <Loader /> : <Icon name="gate" size={18} />}
+                      Submit for adjudication
+                    </button>
+                    <span className="hint">
+                      {!account
+                        ? 'Connect a wallet to submit.'
+                        : !onRightChain
+                          ? 'Switch to Studio Next to submit.'
+                          : busy
+                            ? 'A transaction is in progress.'
+                            : !snapshot
+                              ? 'Waiting for contract state from Studio Next before submitting.'
+                              : 'Deterministic limits run first; then validators fetch and assess the evidence.'}
+                    </span>
+                  </div>
+                </section>
               </form>
             </Panel>
 
@@ -650,7 +731,7 @@ export default function CommandCenter() {
             />
             <div className="actions">
               <button type="button" className="btn secondary small" onClick={() => void refresh('final')} disabled={refreshing}>
-                {refreshing ? <span className="spinner" aria-hidden="true" /> : null}
+                {refreshing ? <Loader /> : null}
                 Refresh finalized state
               </button>
               <span className="hint">
@@ -698,33 +779,50 @@ function WalletGate({
   error: string | null;
 }) {
   return (
-    <div style={{ display: 'grid', gap: 8 }}>
+    <div className="gate-notices">
       {!hasWallet ? (
         <div className="notice info">
-          Reading works without a wallet. To submit, install an EIP-1193 browser wallet such as MetaMask or Rabby.
+          <Icon name="bolt" size={16} />
+          <span className="notice-text">
+            Reading works without a wallet. To submit, install an EIP-1193 browser wallet such as MetaMask or Rabby.
+          </span>
         </div>
       ) : !account ? (
-        <div className="notice info">Connect a wallet from the top bar to submit proposals. Everything on this page is readable without one.</div>
+        <div className="notice info">
+          <Icon name="bolt" size={16} />
+          <span className="notice-text">
+            Connect a wallet from the top bar to submit proposals. Everything on this page is readable without one.
+          </span>
+        </div>
       ) : !onRightChain ? (
         <div className="notice warn notice-row">
-          <span>Your wallet is on another network. MandateGate runs on GenLayer Studio Next (chain {CHAIN_ID}).</span>
-          <button type="button" className="btn small" onClick={onSwitch}>
+          <Icon name="map" size={16} />
+          <span className="notice-text">
+            Your wallet is on another network. MandateGate runs on GenLayer Studio Next (chain {CHAIN_ID}).
+          </span>
+          <button type="button" className="btn btn-primary small" onClick={onSwitch}>
             Switch to Studio Next
           </button>
         </div>
       ) : balance !== null && balance < LOW_BALANCE ? (
         <div className="notice warn notice-row">
-          <span>
+          <Icon name="bolt" size={16} />
+          <span className="notice-text">
             Balance {gen(balance)}. Studio Next transactions take a refundable fee deposit. Use the development faucet
             to get test GEN, which has no value.
           </span>
-          <button type="button" className="btn small" onClick={onFund} disabled={funding}>
-            {funding ? <span className="spinner" aria-hidden="true" /> : null}
+          <button type="button" className="btn btn-primary small" onClick={onFund} disabled={funding}>
+            {funding ? <Loader /> : null}
             Get test GEN
           </button>
         </div>
       ) : null}
-      {error ? <div className="notice bad">{error}</div> : null}
+      {error ? (
+        <div className="notice bad" role="alert">
+          <Icon name="cross" size={16} />
+          <span className="notice-text">{error}</span>
+        </div>
+      ) : null}
     </div>
   );
 }
@@ -738,6 +836,16 @@ const STEPS: { key: string; label: string }[] = [
   { key: 'finalized', label: 'Finalized' },
 ];
 
+type StepState = 'done' | 'active' | 'failed' | 'pending' | 'final';
+
+const STEP_TEXT: Record<StepState, string> = {
+  done: 'completed',
+  active: 'in progress',
+  failed: 'failed',
+  pending: 'not started',
+  final: 'finalized',
+};
+
 function DecisionPanel({
   active,
   selected,
@@ -749,13 +857,14 @@ function DecisionPanel({
 }) {
   if (!active) {
     return (
-      <Panel title="Decision" id="decision-title">
+      <Panel title="Decision" kicker="Quest result" icon="flag" id="decision-title" className="decision-panel">
         {selected ? (
           <Verdict proposal={selected} finality="final" />
         ) : (
           <div className="empty">
+            <Gatekeeper mood="idle" size={72} />
             <strong>No decision selected</strong>
-            Submit a proposal to watch it move through consensus, or choose one from the history below.
+            <span>Submit a proposal to watch it move through consensus, or choose one from the history below.</span>
           </div>
         )}
       </Panel>
@@ -763,24 +872,42 @@ function DecisionPanel({
   }
 
   const failedAt = active.stage === 'failed';
-  const reached = (key: string) => {
+  const stepState = (key: string): StepState => {
     const order = STEPS.map((s) => s.key);
-    const current = failedAt ? order.indexOf(active.tracked ? (active.tracked.phase === 'finalized' ? 'finalized' : active.tracked.phase) : active.hash ? 'pending' : 'signing') : order.indexOf(active.stage);
+    const current = failedAt
+      ? order.indexOf(
+          active.tracked
+            ? active.tracked.phase === 'finalized'
+              ? 'finalized'
+              : active.tracked.phase
+            : active.hash
+              ? 'pending'
+              : 'signing',
+        )
+      : order.indexOf(active.stage);
     const index = order.indexOf(key);
     if (index < current) return 'done';
-    if (index === current) return failedAt ? 'failed' : active.stage === 'finalized' ? 'done' : 'active';
-    return '';
+    if (index === current) {
+      if (failedAt) return 'failed';
+      return active.stage === 'finalized' ? 'final' : 'active';
+    }
+    return 'pending';
   };
   const t = active.tracked;
+  const inFlight = !['finalized', 'failed'].includes(active.stage);
+  const waiting = active.stage === 'pending' || active.stage === 'processing';
 
   return (
     <Panel
       title={active.kind === 'evaluate' ? 'Decision' : 'Authorization cancellation'}
+      kicker="Quest result"
+      icon="flag"
       id="decision-title"
+      className="decision-panel"
       meta={
-        !['finalized', 'failed'].includes(active.stage) ? (
-          <span style={{ display: 'inline-flex', gap: 6, alignItems: 'center' }}>
-            <span className="spinner" aria-hidden="true" /> In progress
+        inFlight ? (
+          <span className="inline-status">
+            <Loader /> In progress
           </span>
         ) : (
           <button type="button" className="btn ghost small" onClick={onDismiss}>
@@ -789,14 +916,24 @@ function DecisionPanel({
         )
       }
     >
-      <div style={{ display: 'grid', gap: 16 }}>
+      <div className="decision-body">
         <ol className="lifecycle" aria-label="Transaction lifecycle">
-          {STEPS.map((s) => (
-            <li key={s.key} className={reached(s.key)}>
-              <span className="bar" />
-              {s.label}
-            </li>
-          ))}
+          {STEPS.map((s) => {
+            const state = stepState(s.key);
+            const icon: IconName | null =
+              state === 'done' ? 'check' : state === 'failed' ? 'cross' : state === 'final' ? 'flag' : null;
+            return (
+              <li key={s.key} className={`checkpoint ${state}`} aria-current={state === 'active' ? 'step' : undefined}>
+                <span className="checkpoint-node" aria-hidden="true">
+                  {icon ? <Icon name={icon} size={14} /> : state === 'active' ? <Loader /> : <span className="node-dot" />}
+                </span>
+                <span className="checkpoint-label">
+                  {s.label}
+                  <span className="visually-hidden">: {STEP_TEXT[state]}</span>
+                </span>
+              </li>
+            );
+          })}
         </ol>
 
         <dl className="tx-grid">
@@ -823,44 +960,81 @@ function DecisionPanel({
           </dd>
         </dl>
 
-        {active.stage === 'quoting' ? <div className="notice info">Reading live fee prices from Studio Next…</div> : null}
-        {active.stage === 'signing' ? <div className="notice info">Confirm the transaction in your wallet.</div> : null}
-        {active.stage === 'pending' || active.stage === 'processing' ? (
+        {active.stage === 'quoting' ? (
           <div className="notice info">
-            {active.kind === 'evaluate'
-              ? 'The leader and validators are each fetching the evidence and assessing it against the mandate. This usually takes one to three minutes.'
-              : 'Validators are executing the owner-only cancellation.'}
+            <Loader />
+            <span className="notice-text">Reading live fee prices from Studio Next…</span>
+          </div>
+        ) : null}
+        {active.stage === 'signing' ? (
+          <div className="notice info">
+            <Icon name="bolt" size={16} />
+            <span className="notice-text">Confirm the transaction in your wallet.</span>
+          </div>
+        ) : null}
+        {waiting ? (
+          <div className="notice info waiting-notice">
+            <Gatekeeper mood="waiting" size={48} />
+            <span className="notice-text">
+              {active.kind === 'evaluate'
+                ? 'The leader and validators are each fetching the evidence and assessing it against the mandate. This usually takes one to three minutes.'
+                : 'Validators are executing the owner-only cancellation.'}
+            </span>
           </div>
         ) : null}
         {active.stage === 'decided' && t?.executed && active.kind === 'evaluate' && !active.outcome ? (
-          <div className="notice info">Consensus decided and execution succeeded. Reading the recorded decision…</div>
+          <div className="notice info">
+            <Loader />
+            <span className="notice-text">Consensus decided and execution succeeded. Reading the recorded decision…</span>
+          </div>
         ) : null}
         {active.stage === 'decided' && t?.executed && active.kind === 'cancel' ? (
           <div className="notice info">
-            Consensus decided and execution succeeded. The release is shown as final once the transaction finalizes.
+            <Icon name="bolt" size={16} />
+            <span className="notice-text">
+              Consensus decided and execution succeeded. The release is shown as final once the transaction finalizes.
+            </span>
           </div>
         ) : null}
         {active.stage === 'decided' && t && !t.executed ? (
           <div className="notice warn">
-            Consensus decided but execution did not succeed ({t.statusName}/{t.executionResult ?? 'unknown'}). Waiting for
-            finality before reporting.
+            <Icon name="question" size={16} />
+            <span className="notice-text">
+              Consensus decided but execution did not succeed ({t.statusName}/{t.executionResult ?? 'unknown'}). Waiting
+              for finality before reporting.
+            </span>
           </div>
         ) : null}
-        {active.error ? <div className="notice bad">{active.error}</div> : null}
+        {active.error ? (
+          <div className="notice bad" role="alert">
+            <Gatekeeper mood="concerned" size={44} />
+            <span className="notice-text">{active.error}</span>
+          </div>
+        ) : null}
 
         {active.kind === 'evaluate' && active.outcome ? (
-          <Verdict proposal={active.outcome} finality={active.outcomeFinality === 'final' ? 'final' : 'decided'} />
+          <Verdict
+            proposal={active.outcome}
+            finality={active.outcomeFinality === 'final' ? 'final' : 'decided'}
+            celebrate={active.stage === 'finalized'}
+          />
         ) : null}
         {active.kind === 'cancel' && active.stage === 'finalized' ? (
           active.outcome?.authorization === 'CANCELLED' ? (
             <div className="notice ok">
-              Authorization {active.proposalId} is cancelled and its reservation was released (read back from finalized
-              contract state). The original judgment stays in the history.
+              <Icon name="undo" size={16} />
+              <span className="notice-text">
+                Authorization {active.proposalId} is cancelled and its reservation was released (read back from
+                finalized contract state). The original judgment stays in the history.
+              </span>
             </div>
           ) : (
             <div className="notice warn">
-              The transaction finalized, but the finalized contract state does not yet show this authorization as
-              cancelled. Use Refresh finalized state to check again.
+              <Icon name="question" size={16} />
+              <span className="notice-text">
+                The transaction finalized, but the finalized contract state does not yet show this authorization as
+                cancelled. Use Refresh finalized state to check again.
+              </span>
             </div>
           )
         ) : null}

@@ -13,6 +13,9 @@ import {
   type Summary,
 } from '@/lib/mandate';
 import { explorerAddress, explorerTx } from '@/lib/genlayer';
+import { Gatekeeper, Icon, Sparkles, type IconName } from './art';
+
+export { Mark } from './art';
 
 export function Panel({
   title,
@@ -21,6 +24,8 @@ export function Panel({
   id,
   bodyless,
   className,
+  icon,
+  kicker,
 }: {
   title: string;
   meta?: ReactNode;
@@ -28,13 +33,30 @@ export function Panel({
   id?: string;
   bodyless?: boolean;
   className?: string;
+  icon?: IconName;
+  /** Small secondary display label shown above the factual title. */
+  kicker?: string;
 }) {
   return (
     <section className={`panel${className ? ` ${className}` : ''}`} aria-labelledby={id}>
       <header className="panel-head">
-        <h2 className="panel-title" id={id}>
-          {title}
-        </h2>
+        <div className="panel-heading">
+          {icon ? (
+            <span className="icon-tile" aria-hidden="true">
+              <Icon name={icon} size={18} />
+            </span>
+          ) : null}
+          <div className="panel-titles">
+            <h2 className="panel-title" id={id}>
+              {kicker ? (
+                <span className="kicker kicker-inline" aria-hidden="true">
+                  {kicker}
+                </span>
+              ) : null}
+              {title}
+            </h2>
+          </div>
+        </div>
         {meta ? <div className="panel-meta">{meta}</div> : null}
       </header>
       {bodyless ? children : <div className="panel-body">{children}</div>}
@@ -42,22 +64,23 @@ export function Panel({
   );
 }
 
-export function Mark() {
-  return (
-    <svg className="brand-mark" viewBox="0 0 32 32" aria-hidden="true">
-      <rect x="1" y="1" width="30" height="30" rx="5" fill="#f1f4f7" />
-      <path d="M8 23V9h3.2l4.8 7 4.8-7H24v14h-3.2v-8.6L16 21l-4.8-6.6V23z" fill="#16212c" />
-      <rect x="7" y="25" width="18" height="2" fill="#4cc28a" />
-    </svg>
-  );
-}
-
 export function Skeleton({ width = '100%', height = 14 }: { width?: string | number; height?: number }) {
   return <span className="skeleton" style={{ width, height }} aria-hidden="true" />;
 }
 
+const STATUS_ICON: Record<Status, IconName> = {
+  COMPLIANT: 'check',
+  NON_COMPLIANT: 'cross',
+  INSUFFICIENT_EVIDENCE: 'question',
+};
+
 export function StatusPill({ status }: { status: Status }) {
-  return <span className={`status-pill ${status}`}>{STATUS_LABEL[status]}</span>;
+  return (
+    <span className={`status-pill ${status}`}>
+      <Icon name={STATUS_ICON[status]} size={12} />
+      {STATUS_LABEL[status]}
+    </span>
+  );
 }
 
 export function ExtLink({ href, children }: { href: string; children: ReactNode }) {
@@ -72,18 +95,33 @@ export function ExtLink({ href, children }: { href: string; children: ReactNode 
 
 export function BudgetPanel({ budget, loading, readLabel }: { budget: Budget | null; loading: boolean; readLabel: string }) {
   const reservedPct = budget ? Math.min(100, (budget.reserved / budget.total_cap) * 100) : 0;
+  // One tick per per-proposal cap: each slot is the most a single proposal can reserve.
+  const ticks = budget && budget.per_proposal_cap > 0 ? Math.floor(budget.total_cap / budget.per_proposal_cap) : 0;
   return (
-    <Panel title="Treasury authorization budget" meta={readLabel} id="budget-title" bodyless className="budget-panel">
+    <Panel
+      title="Treasury authorization budget"
+      kicker="Resource status"
+      icon="target"
+      meta={readLabel}
+      id="budget-title"
+      bodyless
+      className="budget-panel"
+    >
       <div className="budget-figures">
         {(
           [
-            ['Total cap', budget?.total_cap, 'total'],
-            ['Reserved', budget?.reserved, 'reserved'],
-            ['Available', budget?.available, 'available'],
+            ['Total cap', budget?.total_cap, 'total', 'target'],
+            ['Reserved', budget?.reserved, 'reserved', 'lock'],
+            ['Available', budget?.available, 'available', 'gate'],
           ] as const
-        ).map(([label, value, cls]) => (
+        ).map(([label, value, cls, icon]) => (
           <div className={`figure ${cls}`} key={label}>
-            <div className="figure-label">{label}</div>
+            <div className="figure-label">
+              <span className="figure-marker" aria-hidden="true">
+                <Icon name={icon} size={14} />
+              </span>
+              {label}
+            </div>
             <div className="figure-value">
               {loading || value === undefined ? <Skeleton width={120} height={26} /> : units(value)}
             </div>
@@ -100,13 +138,18 @@ export function BudgetPanel({ budget, loading, readLabel }: { budget: Budget | n
           aria-valuemax={budget?.total_cap ?? 100}
           aria-valuenow={budget?.reserved ?? 0}
         >
-          <span style={{ width: `${reservedPct}%` }} />
+          <span className="meter-fill" style={{ width: `${reservedPct}%` }} />
+          {Array.from({ length: Math.max(0, ticks - 1) }, (_, i) => (
+            <span key={i} className="meter-tick" style={{ left: `${((i + 1) / ticks) * 100}%` }} aria-hidden="true" />
+          ))}
         </div>
         <div className="meter-legend">
-          <span>
+          <span className="legend-item">
+            <span className="swatch swatch-reserved" aria-hidden="true" />
             {budget ? `${reservedPct.toFixed(0)}% of the cap is reserved by COMPLIANT authorizations` : 'Reading budget…'}
           </span>
-          <span>
+          <span className="legend-item">
+            <span className="swatch swatch-tick" aria-hidden="true" />
             Per-proposal cap <b className="num">{budget ? units(budget.per_proposal_cap) : '…'}</b>
           </span>
         </div>
@@ -121,19 +164,32 @@ export function MandatePanel({ mandate, loading }: { mandate: Mandate | null; lo
   return (
     <Panel
       title="Frozen mandate"
-      meta={<span className="frozen-tag">Version {mandate?.mandate_version ?? '…'} · immutable</span>}
+      kicker="Rulebook"
+      icon="shield"
+      className="rulebook-panel"
+      meta={
+        <span className="frozen-tag">
+          <Icon name="lock" size={12} />
+          Version {mandate?.mandate_version ?? '…'} · immutable
+        </span>
+      }
       id="mandate-title"
     >
       {loading || !mandate ? (
-        <div style={{ display: 'grid', gap: 8 }}>
+        <div className="skeleton-stack">
           <Skeleton />
           <Skeleton />
           <Skeleton width="70%" />
         </div>
       ) : (
-        <blockquote className="mandate-text">{mandate.mandate_text}</blockquote>
+        <div className="rulebook">
+          <span className="seal" aria-hidden="true">
+            <Icon name="lock" size={16} />
+          </span>
+          <blockquote className="mandate-text">{mandate.mandate_text}</blockquote>
+        </div>
       )}
-      <p className="hint" style={{ margin: '10px 0 0' }}>
+      <p className="hint mandate-note">
         Stored in the contract at deployment. No method can change it. Every adjudication quotes this text to the
         validators verbatim.
       </p>
@@ -153,7 +209,7 @@ export function ConfigPanel({
   venue: string;
 }) {
   return (
-    <Panel title="Configured target" id="config-title">
+    <Panel title="Configured target" icon="map" id="config-title" className="side-panel">
       <dl className="kv">
         <dt>Token pair</dt>
         <dd className="mono">{mandate?.pair ?? '…'}</dd>
@@ -179,17 +235,27 @@ export function ConfigPanel({
 }
 
 export function StatsPanel({ summary }: { summary: Summary | null }) {
-  const cells: [string, number | undefined][] = [
-    ['Compliant', summary?.compliant],
-    ['Non-compliant', summary?.non_compliant],
-    ['Insufficient evidence', summary?.insufficient_evidence],
-    ['Cancelled authorizations', summary?.cancelled],
+  const cells: [string, number | undefined, string, IconName][] = [
+    ['Compliant', summary?.compliant, 'ok', 'check'],
+    ['Non-compliant', summary?.non_compliant, 'bad', 'cross'],
+    ['Insufficient evidence', summary?.insufficient_evidence, 'warn', 'question'],
+    ['Cancelled authorizations', summary?.cancelled, 'muted', 'undo'],
   ];
   return (
-    <Panel title="Adjudications" meta={summary ? `${summary.proposals} recorded` : undefined} id="stats-title" bodyless>
+    <Panel
+      title="Adjudications"
+      icon="star"
+      className="side-panel"
+      meta={summary ? `${summary.proposals} recorded` : undefined}
+      id="stats-title"
+      bodyless
+    >
       <div className="stats">
-        {cells.map(([label, value]) => (
-          <div className="stat" key={label}>
+        {cells.map(([label, value, tone, icon]) => (
+          <div className={`stat stat-${tone}`} key={label}>
+            <span className="stat-icon" aria-hidden="true">
+              <Icon name={icon} size={14} />
+            </span>
             <b>{value ?? '–'}</b>
             <span>{label}</span>
           </div>
@@ -201,10 +267,13 @@ export function StatsPanel({ summary }: { summary: Summary | null }) {
 
 export function DivisionPanel() {
   return (
-    <Panel title="Who decides what" id="division-title">
+    <Panel title="Who decides what" icon="nodes" id="division-title" className="side-panel">
       <div className="split-line">
-        <div>
-          <h3>Contract code (deterministic)</h3>
+        <div className="split-col">
+          <h3>
+            <Icon name="gear" size={16} />
+            Contract code (deterministic)
+          </h3>
           <ul>
             <li>Pair and pool identity, unique proposal ID</li>
             <li>Positive integer amount, 25,000 per proposal</li>
@@ -213,8 +282,11 @@ export function DivisionPanel() {
             <li>Findings → status mapping, budget arithmetic</li>
           </ul>
         </div>
-        <div>
-          <h3>GenLayer validators (consensus)</h3>
+        <div className="split-col">
+          <h3>
+            <Icon name="nodes" size={16} />
+            GenLayer validators (consensus)
+          </h3>
           <ul>
             <li>Fetch every evidence URL themselves</li>
             <li>Read it against the frozen mandate</li>
@@ -228,7 +300,16 @@ export function DivisionPanel() {
 
 // ---------------------------------------------------------------- verdict
 
-export function Verdict({ proposal, finality }: { proposal: Proposal; finality: 'final' | 'decided' }) {
+export function Verdict({
+  proposal,
+  finality,
+  celebrate = false,
+}: {
+  proposal: Proposal;
+  finality: 'final' | 'decided';
+  /** Play the one-shot sparkle (only for a freshly finalized COMPLIANT result). */
+  celebrate?: boolean;
+}) {
   const used = new Set(proposal.supporting_urls);
   const effect =
     proposal.authorization === 'RESERVED'
@@ -236,14 +317,23 @@ export function Verdict({ proposal, finality }: { proposal: Proposal; finality: 
       : proposal.authorization === 'CANCELLED'
         ? 'Authorization cancelled by the owner; reservation released'
         : 'Budget unchanged; nothing reserved';
+  const mood = proposal.status === 'COMPLIANT' ? 'happy' : proposal.status === 'NON_COMPLIANT' ? 'concerned' : 'idle';
   return (
     <div className="verdict">
       <div className={`verdict-banner ${proposal.status}`}>
-        <div>
-          <div className="verdict-status">{proposal.status}</div>
+        {celebrate && proposal.status === 'COMPLIANT' && finality === 'final' ? <Sparkles /> : null}
+        <Gatekeeper mood={mood} size={56} className="verdict-mascot" />
+        <div className="verdict-copy">
+          <div className="verdict-status">
+            <Icon name={STATUS_ICON[proposal.status]} size={20} />
+            {proposal.status}
+          </div>
           <div className="verdict-effect">{effect}</div>
         </div>
-        <span className={`status-pill neutral`}>{finality === 'final' ? 'Finalized state' : 'Decided · not yet final'}</span>
+        <span className={`finality-tag ${finality}`}>
+          <Icon name={finality === 'final' ? 'flag' : 'bolt'} size={12} />
+          {finality === 'final' ? 'Finalized state' : 'Decided · not yet final'}
+        </span>
       </div>
       <dl className="tx-grid">
         <dt>Proposal</dt>
@@ -322,7 +412,10 @@ export function HistoryPanel({
   return (
     <Panel
       title="Proposal and authorization history"
+      kicker="Mission log"
+      icon="log"
       id="history-title"
+      className="history-panel"
       bodyless
       meta={
         <div className="filters" role="group" aria-label="Filter history">
@@ -335,73 +428,84 @@ export function HistoryPanel({
       }
     >
       {loading ? (
-        <div className="panel-body" style={{ display: 'grid', gap: 10 }}>
+        <div className="panel-body skeleton-stack">
           <Skeleton />
           <Skeleton />
           <Skeleton width="60%" />
         </div>
       ) : rows.length === 0 ? (
         <div className="empty">
+          <Gatekeeper mood="idle" size={64} />
           <strong>{proposals.length === 0 ? 'No proposals adjudicated yet' : 'Nothing matches this filter'}</strong>
-          {proposals.length === 0
-            ? 'Submit the first proposal above. Its decision will be recorded here after consensus.'
-            : 'Choose another filter to see the rest of the history.'}
+          <span>
+            {proposals.length === 0
+              ? 'Submit the first proposal above. Its decision will be recorded here after consensus.'
+              : 'Choose another filter to see the rest of the history.'}
+          </span>
         </div>
       ) : (
-        <table className="history">
-          <thead>
-            <tr>
-              <th>Proposal</th>
-              <th>Status</th>
-              <th className="num">Amount</th>
-              <th>Authorization</th>
-              <th>Decided</th>
-              <th>
-                <span className="visually-hidden">Actions</span>
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            {rows.map((p) => (
-              <tr key={p.proposal_id} className={selectedId === p.proposal_id ? 'selected' : ''}>
-                <td>
-                  <button type="button" className="row-link" onClick={() => onSelect(p.proposal_id)}>
-                    {p.proposal_id}
-                  </button>
-                </td>
-                <td>
-                  <StatusPill status={p.status} />
-                </td>
-                <td className="num">{units(p.amount)}</td>
-                <td>
-                  <span className={`auth-tag ${p.authorization}`}>
-                    {p.authorization === 'RESERVED'
-                      ? `Reserved ${units(p.reserved_amount)}`
-                      : p.authorization === 'CANCELLED'
-                        ? 'Cancelled'
-                        : 'None'}
-                  </span>
-                </td>
-                <td data-col="when" className="hint">
-                  {p.decided_at ? new Date(p.decided_at * 1000).toLocaleString('en-GB', { dateStyle: 'medium', timeStyle: 'short' }) : '–'}
-                </td>
-                <td>
-                  {p.authorization === 'RESERVED' ? (
-                    <button
-                      type="button"
-                      className="btn danger small"
-                      disabled={!isOwner || busy}
-                      title={isOwner ? 'Release this reservation' : 'Only the contract owner can cancel an authorization'}
-                      onClick={() => onCancel(p.proposal_id)}
-                    >
-                      Cancel
-                    </button>
-                  ) : null}
-                </td>
+        <div className="table-wrap">
+          <table className="history">
+            <thead>
+              <tr>
+                <th>Proposal</th>
+                <th>Status</th>
+                <th className="num">Amount</th>
+                <th>Authorization</th>
+                <th>Decided</th>
+                <th>
+                  <span className="visually-hidden">Actions</span>
+                </th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {rows.map((p) => (
+                <tr key={p.proposal_id} className={selectedId === p.proposal_id ? 'selected' : ''}>
+                  <td data-col="id">
+                    <button type="button" className="row-link" onClick={() => onSelect(p.proposal_id)}>
+                      {p.proposal_id}
+                    </button>
+                  </td>
+                  <td data-col="status">
+                    <StatusPill status={p.status} />
+                  </td>
+                  <td data-col="amount" className="num">
+                    {units(p.amount)}
+                  </td>
+                  <td data-col="auth">
+                    <span className={`auth-tag ${p.authorization}`}>
+                      {p.authorization === 'RESERVED' ? <Icon name="lock" size={12} /> : null}
+                      {p.authorization === 'CANCELLED' ? <Icon name="undo" size={12} /> : null}
+                      {p.authorization === 'RESERVED'
+                        ? `Reserved ${units(p.reserved_amount)}`
+                        : p.authorization === 'CANCELLED'
+                          ? 'Cancelled'
+                          : 'None'}
+                    </span>
+                  </td>
+                  <td data-col="when" className="hint">
+                    {p.decided_at
+                      ? new Date(p.decided_at * 1000).toLocaleString('en-GB', { dateStyle: 'medium', timeStyle: 'short' })
+                      : '–'}
+                  </td>
+                  <td data-col="action">
+                    {p.authorization === 'RESERVED' ? (
+                      <button
+                        type="button"
+                        className="btn danger small"
+                        disabled={!isOwner || busy}
+                        title={isOwner ? 'Release this reservation' : 'Only the contract owner can cancel an authorization'}
+                        onClick={() => onCancel(p.proposal_id)}
+                      >
+                        Cancel
+                      </button>
+                    ) : null}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       )}
     </Panel>
   );
