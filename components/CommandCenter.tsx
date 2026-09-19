@@ -445,6 +445,30 @@ export default function CommandCenter() {
       </div>
 
       <main className="page">
+        <section className="page-intro" aria-labelledby="page-title">
+          <div className="intro-copy">
+            <h1 id="page-title">Review every allocation before it moves.</h1>
+            <p>
+              Read the frozen mandate, confirm the evidence sources, and submit one treasury authorization to GenLayer
+              consensus.
+            </p>
+          </div>
+          <div className="intro-rail" aria-label="Authorization review flow">
+            <div className="intro-step">
+              <span className="intro-step-index">01</span>
+              <span>Read mandate</span>
+            </div>
+            <div className="intro-step">
+              <span className="intro-step-index">02</span>
+              <span>Check evidence</span>
+            </div>
+            <div className="intro-step">
+              <span className="intro-step-index">03</span>
+              <span>Submit authorization</span>
+            </div>
+          </div>
+        </section>
+
         {!configured ? (
           <div className="notice bad" style={{ marginBottom: 20 }}>
             No MandateGate contract is configured. Run <code>npm run deploy:contract</code> or set
@@ -470,6 +494,7 @@ export default function CommandCenter() {
             <Panel
               title="New proposal"
               id="form-title"
+              className="proposal-panel"
               meta={
                 <span>
                   {demo.pair} · <span className="mono">{demo.poolId}</span>

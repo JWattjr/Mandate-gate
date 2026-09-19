@@ -20,15 +20,17 @@ export function Panel({
   children,
   id,
   bodyless,
+  className,
 }: {
   title: string;
   meta?: ReactNode;
   children: ReactNode;
   id?: string;
   bodyless?: boolean;
+  className?: string;
 }) {
   return (
-    <section className="panel" aria-labelledby={id}>
+    <section className={`panel${className ? ` ${className}` : ''}`} aria-labelledby={id}>
       <header className="panel-head">
         <h2 className="panel-title" id={id}>
           {title}
@@ -71,7 +73,7 @@ export function ExtLink({ href, children }: { href: string; children: ReactNode 
 export function BudgetPanel({ budget, loading, readLabel }: { budget: Budget | null; loading: boolean; readLabel: string }) {
   const reservedPct = budget ? Math.min(100, (budget.reserved / budget.total_cap) * 100) : 0;
   return (
-    <Panel title="Treasury authorization budget" meta={readLabel} id="budget-title" bodyless>
+    <Panel title="Treasury authorization budget" meta={readLabel} id="budget-title" bodyless className="budget-panel">
       <div className="budget-figures">
         {(
           [
