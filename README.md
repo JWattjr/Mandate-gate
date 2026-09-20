@@ -13,6 +13,8 @@ against the contract's 100,000-unit authorization budget.
 > backend or database.
 
 - **Live app:** https://mandate-gate-azure.vercel.app
+- **Source:** https://github.com/JWattjr/Mandate-gate
+- **Portal submission:** [PORTAL_SUBMISSION.md](PORTAL_SUBMISSION.md) (pitch, proof transactions, 60-second demo script)
 - **Network:** GenLayer Studio Next (`studioDevnet`, chain 61997, RPC `https://studio-dev.genlayer.com/api`)
 - **Contract:** see [`lib/deployment.json`](lib/deployment.json). Proof transactions are in [`deploy/proof.json`](deploy/proof.json) and [PORTAL_SUBMISSION.md](PORTAL_SUBMISSION.md).
 - **Evidence fixtures:** https://mandate-gate-azure.vercel.app/evidence/
