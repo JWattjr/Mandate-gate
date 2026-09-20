@@ -14,6 +14,17 @@ Live app: **https://mandate-gate-azure.vercel.app** · Network: GenLayer **Studi
 > This is an authorization prototype. No assets are held or deployed. Amounts are
 > accounting units, and the pool is a synthetic venue.
 
+## Paste-ready Portal fields
+
+- **Title:** MandateGate — Treasury mandate and budget-reservation authorization engine
+- **One-line description (<160 characters):** On-chain treasury mandate and budget-reservation authorization engine adjudicating liquidity proposals with GenLayer validator consensus.
+- **Concise description:** MandateGate freezes a treasury policy in a GenLayer intelligent contract. Validators independently fetch submitted evidence and classify each proposal as compliant, non-compliant or insufficient; only a compliant result reserves the accounting budget. This is an authorization prototype, not a custody or DEX system.
+- **Demo URL:** https://mandate-gate-azure.vercel.app
+- **Repository URL:** https://github.com/JWattjr/Mandate-gate
+- **Contract address:** `0xA8a0Af05833A431bb59b9A2D8B565FD3E344E3e0`
+- **Environment:** GenLayer Studio Dev / Studio Next · chain `61997`
+- **Tags:** treasury, mandate authorization, budget reservation, liquidity risk, policy enforcement, evidence verification, validator consensus, intelligent contract
+
 ## Why deterministic contract logic is not enough
 
 A deterministic contract can enforce "≤ 25,000 per proposal" and "≤ 100,000

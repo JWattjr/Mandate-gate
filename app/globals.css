@@ -2419,6 +2419,12 @@ legend.stage-title + * {
   .history td[data-col='id'] {
     grid-area: id;
   }
+  .history td[data-col='id'] .row-link {
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+    padding-block: 8px;
+  }
   .history td[data-col='status'] {
     grid-area: status;
     justify-self: end;

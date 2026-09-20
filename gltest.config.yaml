@@ -4,7 +4,9 @@ networks:
   default: localnet
   localnet:
     url: "http://127.0.0.1:4000/api"
-  # Studio Next: chain 61997, RPC https://studio-dev.genlayer.com/api
+  # The pinned gltest 0.30.0rc2 release provides Studio Next as the
+  # preconfigured `studio_devnet` network (chain 61997). Direct tests stay on
+  # localnet and do not make a network request.
   studio_devnet: {}
 paths:
   contracts: "contracts"

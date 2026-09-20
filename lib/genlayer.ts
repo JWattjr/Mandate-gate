@@ -19,6 +19,7 @@ import {
 import { createTransactionKit, type PolicyQuote, type SubmitInput } from '@genlayer/transaction-kit';
 import deployment from './deployment.json';
 import demo from '../config/demo.json';
+import feeProfile from '../fee-profile.json';
 import {
   isBudget,
   isMandate,
@@ -138,6 +139,9 @@ function kitFor(provider: BrowserProvider, address: string) {
     chain,
     provider: guardedProvider(provider, chain, address),
     account: address as `0x${string}`,
+    // Allocations are measured from finalized Studio Next proof receipts;
+    // Transaction Kit still reads live fee prices and verifies the policy hash.
+    suggestions: feeProfile,
   });
 }
 

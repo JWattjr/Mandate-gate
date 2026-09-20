@@ -50,7 +50,7 @@ See [ARCHITECTURE.md](ARCHITECTURE.md) for storage, the validator function, the 
 | `app/`, `components/`, `lib/` | Next.js command center |
 | `public/evidence/` | Three synthetic, clearly labelled evidence fixtures |
 | `config/demo.json` | Mandate text, pair, pool, caps, fixture URLs, explorer |
-| `scripts/` | deploy, seed, smoke, fee estimate, ownership transfer, dev-wallet test harness |
+| `scripts/` | deploy, seed, smoke, fee estimate/profile, ownership transfer, dev-wallet test harness |
 | `deploy/proof.json` | Real transaction hashes, execution results and budget before/after |
 
 ## Setup
@@ -63,7 +63,9 @@ python -m venv .venv
 .venv/Scripts/python -m pip install -r requirements.txt   # macOS/Linux: .venv/bin/python
 ```
 
-Activate the venv before the `contract:*` scripts, because they call `python`.
+The contract npm scripts automatically prefer `.venv` when it exists, so the
+pinned GenLayer tools are used without shell activation. The fallback is the
+platform `python` command after a normal virtual-environment setup.
 
 ## Checks
 
@@ -74,6 +76,7 @@ npm run lint
 npm run typecheck
 npm run test:app
 npm run build
+npm run fees:profile      # read-only measured profile from finalized proof receipts
 npm run smoke           # live, read-only Studio Next checks against deploy/proof.json
 ```
 

@@ -1,0 +1,106 @@
+{
+  "version": 1,
+  "network": "studio_devnet",
+  "chainId": 61997,
+  "measuredAt": "2026-09-20T14:43:42Z",
+  "headroom": 1.25,
+  "source": "Finalized Studio Next receipts from deploy/proof.json; no transaction submitted by this script.",
+  "methods": {
+    "evaluate_proposal": {
+      "leaderTimeunitsAllocation": "125",
+      "validatorTimeunitsAllocation": "250",
+      "executionBudgetPerRound": "206447812500000",
+      "totalMessageFees": "0",
+      "rotationsPerRound": "0"
+    },
+    "cancel_authorization": {
+      "leaderTimeunitsAllocation": "125",
+      "validatorTimeunitsAllocation": "250",
+      "executionBudgetPerRound": "196584687500000",
+      "totalMessageFees": "0",
+      "rotationsPerRound": "0"
+    }
+  },
+  "scenarios": [
+    {
+      "key": "compliant",
+      "status": "COMPLIANT",
+      "method": "evaluate_proposal",
+      "transaction": "0x815ef37599f73b1beeeb63492465325edc951d4c18306ecae2c02befc3e6a17e",
+      "observed": {
+        "leaderTimeunitsAllocation": "100",
+        "validatorTimeunitsAllocation": "200",
+        "executionBudgetPerRound": "163068250000000",
+        "totalMessageFees": "0",
+        "rotationsPerRound": "0"
+      },
+      "profiled": {
+        "leaderTimeunitsAllocation": "125",
+        "validatorTimeunitsAllocation": "250",
+        "executionBudgetPerRound": "203835312500000",
+        "totalMessageFees": "0",
+        "rotationsPerRound": "0"
+      }
+    },
+    {
+      "key": "non_compliant",
+      "status": "NON_COMPLIANT",
+      "method": "evaluate_proposal",
+      "transaction": "0x0d00b374b20875e99b7ce99a7f3771f76035034ef54db089e70286da91b45e24",
+      "observed": {
+        "leaderTimeunitsAllocation": "100",
+        "validatorTimeunitsAllocation": "200",
+        "executionBudgetPerRound": "163364500000000",
+        "totalMessageFees": "0",
+        "rotationsPerRound": "0"
+      },
+      "profiled": {
+        "leaderTimeunitsAllocation": "125",
+        "validatorTimeunitsAllocation": "250",
+        "executionBudgetPerRound": "204205625000000",
+        "totalMessageFees": "0",
+        "rotationsPerRound": "0"
+      }
+    },
+    {
+      "key": "insufficient",
+      "status": "INSUFFICIENT_EVIDENCE",
+      "method": "evaluate_proposal",
+      "transaction": "0x9ea39506ea8e1eb5acfd08763eb27d061a782ce963db5810bd5f30baec859818",
+      "observed": {
+        "leaderTimeunitsAllocation": "100",
+        "validatorTimeunitsAllocation": "200",
+        "executionBudgetPerRound": "165158250000000",
+        "totalMessageFees": "0",
+        "rotationsPerRound": "0"
+      },
+      "profiled": {
+        "leaderTimeunitsAllocation": "125",
+        "validatorTimeunitsAllocation": "250",
+        "executionBudgetPerRound": "206447812500000",
+        "totalMessageFees": "0",
+        "rotationsPerRound": "0"
+      }
+    },
+    {
+      "key": "cancellation",
+      "status": "CANCELLED",
+      "method": "cancel_authorization",
+      "transaction": "0x0e8046b7a275bd889ea12f8d5b9819dd91f1d441a250098760a54be550dbcd5f",
+      "observed": {
+        "leaderTimeunitsAllocation": "100",
+        "validatorTimeunitsAllocation": "200",
+        "executionBudgetPerRound": "157267750000000",
+        "totalMessageFees": "0",
+        "rotationsPerRound": "0"
+      },
+      "profiled": {
+        "leaderTimeunitsAllocation": "125",
+        "validatorTimeunitsAllocation": "250",
+        "executionBudgetPerRound": "196584687500000",
+        "totalMessageFees": "0",
+        "rotationsPerRound": "0"
+      }
+    }
+  ]
+}

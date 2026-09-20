@@ -95,6 +95,7 @@ through `gen_getContractSchemaForCode`.
 - `lib/genlayer.ts`:
   - Reads use an account-free `createClient({ chain: studioDevnet })`.
   - Writes use `@genlayer/transaction-kit` `estimate()` → `submit()` through the injected wallet. The provider is guarded, so it refuses to sign on the wrong chain or account.
+  - `fee-profile.json` supplies measured per-method allocation suggestions from finalized Studio Next proof receipts; live fee prices and policy verification remain authoritative at quote time.
   - Tracking polls `getTransaction` every 5 s. The kit's own `track()` polls every 2 s, which alone would use the 30 requests/minute limit.
   - A rate-limited response is retried after the server's `retry_after_seconds`.
 - **Success is never inferred from lifecycle alone.** A decided transaction must report `FINISHED_WITH_RETURN` and not be `UNDETERMINED`. The UI then reads the proposal back from contract state.
